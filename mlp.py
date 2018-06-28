@@ -1,4 +1,3 @@
-
 '''Trains a simple deep NN on the MNIST dataset.
 Gets to 98.40% test accuracy after 20 epochs
 (there is *a lot* of margin for parameter tuning).
@@ -21,11 +20,12 @@ from keras.regularizers import l2
 from keras import backend as K
 from keras.models import Model
 from keras.datasets import cifar10
+from keras.utils import plot_model
 import numpy as np
 
 batch_size = 128
 num_classes = 10
-epochs = 20
+epochs = 3
 
 # the data, split between train and test sets
 (x_train, y_train), (x_test, y_test) = mnist.load_data(['/data'])
@@ -51,24 +51,12 @@ inputs = Input(shape=input_shape)
 x = inputs
 #x = keras.layers.add([x, y])
 #x = Activation('relu')(x)
-h = Dense(128,activation='relu',kernel_initializer='he_normal')(x)
-outputs = Dense(num_classes,activation='softmax',kernel_initializer='he_normal')(h)
+h1 = Dense(128,activation='relu',kernel_initializer='he_normal')(x)
+h2 = Dense(32,activation='relu',kernel_initializer='he_normal')(h1)
+outputs = Dense(num_classes,activation='softmax',kernel_initializer='he_normal')(h2)
 
 # Instantiate model.
 model = Model(inputs=inputs, outputs=outputs)
-
-#x = Input(shape=(32,))
-#y = Dense(16, activation='softmax')(x)
-#model = Model(x, y)
-#
-#
-#model = Sequential()
-#model.add(Dense(512, activation='relu', input_shape=(784,)))
-#model.add(Dropout(0.2))
-#model.add(Dense(128, activation='relu', input_shape=(1024,)))
-#model.add(Dropout(0.2))
-#model.add(Dense(num_classes, activation='softmax'))
-
 model.summary()
 
 model.compile(loss='categorical_crossentropy',
@@ -83,4 +71,18 @@ history = model.fit(x_train, y_train,
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
-plot_model(model, to_file='multilayer_perceptron_graph.png')
+#plot_model(model, to_file='multilayer_perceptron_graph.png')
+h_model = Model(inputs=model.input,outputs=model.layers[-2].output)
+z2 = h_model.predict(x_train)
+xx= np.concatenate(x,z2)
+
+
+
+#input1 = keras.layers.Input(shape=(16,))
+#x1 = keras.layers.Dense(8, activation='relu')(input1)
+#input2 = keras.layers.Input(shape=(32,))
+#x2 = keras.layers.Dense(8, activation='relu')(input2)
+#added = keras.layers.Add()([x1, x2])  # equivalent to added = keras.layers.add([x1, x2])
+#
+#out = keras.layers.Dense(4)(added)
+#model = keras.models.Model(inputs=[input1, input2], outputs=out)
