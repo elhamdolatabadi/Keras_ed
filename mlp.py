@@ -11,7 +11,7 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, BatchNormalization, Activation
 from keras.optimizers import RMSprop
-from keras.layers import AveragePooling2D, Input, Flatten
+from keras.layers import AveragePooling2D, Input, Flatten, Concatenate,concatenate
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras.callbacks import ReduceLROnPlateau
@@ -53,7 +53,8 @@ x = inputs
 #x = Activation('relu')(x)
 h1 = Dense(128,activation='relu',kernel_initializer='he_normal')(x)
 h2 = Dense(32,activation='relu',kernel_initializer='he_normal')(h1)
-outputs = Dense(num_classes,activation='softmax',kernel_initializer='he_normal')(h2)
+h22 = concatenate([h2,x])
+outputs = Dense(num_classes,activation='softmax',kernel_initializer='he_normal')(h22)
 
 # Instantiate model.
 model = Model(inputs=inputs, outputs=outputs)
@@ -72,9 +73,9 @@ score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 #plot_model(model, to_file='multilayer_perceptron_graph.png')
-h_model = Model(inputs=model.input,outputs=model.layers[-2].output)
-z2 = h_model.predict(x_train)
-xx= np.concatenate(x,z2)
+#h_model = Model(inputs=model.input,outputs=model.layers[-2].output)
+#z2 = h_model.predict(x_train)
+#xx= np.concatenate(x_train,z2)
 
 
 
