@@ -1,0 +1,141 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+from __future__ import division
+import matplotlib.pyplot as plt
+import numpy as np
+import edReadData as rd
+import pandas as pd
+import random
+from scipy.stats import norm
+from datetime import datetime
+import time
+
+#PRN
+med_col_name = ['Patient ID','name','Dose', 'Route','SSD']   
+clinical_fname = 'Data/Dementia Unit 5 South (1).xlsx'
+med_df = pd.read_excel(open(clinical_fname,'rb'), sheetname='PRN medication')
+med_df = med_df.drop(med_df.index[range(0,8)])
+med_col_name.extend(range(3))
+med_df.columns = med_col_name
+med_col_name = ['Patient ID','name','Dose', 'SSD'] 
+med_df = med_df[med_col_name]
+med_df['SDD'] = med_df['SSD']
+med_df = med_df.dropna()
+#
+med_df.name = med_df.name.str.strip()
+med_df.name = med_df.name.str.lower()
+print(len(med_df.name.unique()))
+med_df.index=med_df['Patient ID']
+med_df = med_df.drop('Patient ID',1)
+med_df.sort_index(inplace=True)
+###https://frickj.wordpress.com/2015/08/25/word2vec-on-drug-labels/
+###http://mccormickml.com/2016/04/12/googles-pretrained-word2vec-model-in-python/
+###https://github.com/clinicalml/embeddings
+##
+print med_df.name.unique
+#med_df = med_df.replace('lansoprazole','lansoprozole')
+med_df = med_df.replace('lorazapam','lorazepam')
+med_df = med_df.replace('lorzaepam','lorazepam')
+med_df = med_df.replace('lorazepam**','lorazepam')
+med_df = med_df.replace('methortrimeprazine','methotrimeprazine')
+med_df = med_df.replace('nozinan','nozinam')
+med_df = med_df.replace('respiradone','rispiradone')
+med_df = med_df.replace('resperidone','rispiradone')
+med_df = med_df.replace('rivastigime','rivastigmine')
+med_df = med_df.replace('sirtraline','sertraline')
+med_df = med_df.replace('setraline','sertraline')
+med_df = med_df.replace('trazadone','trazedone')
+med_df = med_df.replace('trazodon','trazedone')
+med_df = med_df.replace('doenpezil','donepezil')
+med_df = med_df.replace('risperidone','rispiradone')
+med_df = med_df.replace('riperidone','rispiradone')
+med_df = med_df.replace('trazodone','trazedone')
+med_df = med_df.replace('loxipine','loxapine')
+med_df = med_df.replace('noziman','nozinam')
+med_df = med_df.replace('nozinom','nozinam')
+med_df = med_df.replace('n/a','none')
+
+
+##med_df_dummy = pd.get_dummies(med_df.name)
+##med_tot = med_df_dummy*np.tile(med_df.Dose,(med_df_dummy.shape[1],1)).T
+##med_tot['SSD']= med_df.SSD
+#
+med_exclude = ['gabapentin','esomeprazole','risedronate','lansoprozole','none']
+for i in med_exclude:
+    med_df = med_df[med_df.name != i]
+print sorted(med_df.name.unique())
+med_df_dummy = pd.get_dummies(med_df.name)
+med_tot_prn = med_df_dummy*np.tile(med_df.Dose,(med_df_dummy.shape[1],1)).T
+med_tot_prn['SSD']= med_df.SSD
+med_tot_prn['SDD']= med_df.SDD
+
+
+
+med_col_name = ['Patient ID','name','Dose', 'Route','Time of Dose','SSD','SDD']   
+clinical_fname = 'Data/Dementia Unit 5 South (1).xlsx'
+med_df = pd.read_excel(open(clinical_fname,'rb'), sheetname='Scheduled medication')
+med_df = med_df.drop(med_df.index[range(0,8)])
+med_col_name.extend(range(10))
+med_df.columns = med_col_name
+med_col_name = ['Patient ID','name','Dose', 'Time of Dose','SSD','SDD'] 
+med_df = med_df[med_col_name]
+med_df = med_df.dropna()
+#
+med_df.name = med_df.name.str.strip()
+med_df.name = med_df.name.str.lower()
+print(len(med_df.name.unique()))
+med_df.index=med_df['Patient ID']
+med_df = med_df.drop('Patient ID',1)
+med_df.sort_index(inplace=True)
+###https://frickj.wordpress.com/2015/08/25/word2vec-on-drug-labels/
+###http://mccormickml.com/2016/04/12/googles-pretrained-word2vec-model-in-python/
+###https://github.com/clinicalml/embeddings
+##
+print med_df.name.unique
+#med_df = med_df.replace('lansoprazole','lansoprozole')
+med_df = med_df.replace('lorazapam','lorazepam')
+med_df = med_df.replace('lorzaepam','lorazepam')
+med_df = med_df.replace('methortrimeprazine','methotrimeprazine')
+med_df = med_df.replace('nozinan','nozinam')
+med_df = med_df.replace('respiradone','rispiradone')
+med_df = med_df.replace('resperidone','rispiradone')
+med_df = med_df.replace('rivastigime','rivastigmine')
+med_df = med_df.replace('sirtraline','sertraline')
+med_df = med_df.replace('setraline','sertraline')
+med_df = med_df.replace('trazadone','trazedone')
+med_df = med_df.replace('trazodon','trazedone')
+med_df = med_df.replace('doenpezil','donepezil')
+med_df = med_df.replace('risperidone','rispiradone')
+med_df = med_df.replace('riperidone','rispiradone')
+med_df = med_df.replace('trazodone','trazedone')
+
+print sorted(med_df.name.unique())
+print len(med_df.name.unique())
+##med_df_dummy = pd.get_dummies(med_df.name)
+##med_tot = med_df_dummy*np.tile(med_df.Dose,(med_df_dummy.shape[1],1)).T
+#med_tot['SSD']= med_df.SSD
+#
+med_exclude = ['gabapentin','esomeprazole','risedronate','lansoprozole']
+for i in med_exclude:
+    med_df = med_df[med_df.name != i]
+print len(med_df.name.unique())
+
+med_df_dummy = pd.get_dummies(med_df.name)
+med_tot_sch = med_df_dummy*np.tile(med_df.Dose,(med_df_dummy.shape[1],1)).T
+med_tot_sch['SSD']= med_df.SSD
+med_tot_sch['SDD']= med_df.SDD
+#med_tot = med_tot.dropna()
+#
+
+Allmedfeatures = med_tot_sch.columns.values
+Allmedfeatures  = np.append(Allmedfeatures,med_tot_prn.columns.values) 
+Allmedfeatures = np.unique(Allmedfeatures)
+df = pd.DataFrame(columns = Allmedfeatures)
+df = df.append(med_tot_sch)
+df = df.fillna(0)
+df = df.append(med_tot_prn)
+df = df.fillna(0)
